@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>FuelLog</title>
+<style>
+  :root {
+    --bg:       #0d0d0f;
+    --surface:  #18181c;
+    --border:   #2a2a30;
+    --accent:   #e8a430;
+    --accent-dim: #7a5418;
+    --text:     #f0f0f0;
+    --muted:    #888;
+    --danger:   #c0392b;
+    --green:    #27ae60;
+    --radius:   14px;
+    --font:     -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100dvh;
+    max-width: 480px;
+    margin: 0 auto;
+    padding-bottom: 80px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 20px 12px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  header h1 span { color: var(--accent); }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font);
+    transition: opacity .15s;
+  }
+  .btn:active { opacity: .7; }
+  .btn-primary { background: var(--accent); color: #0d0d0f; }
+  .btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+  .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+  .btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    padding: 6px;
+    border-radius: 8px;
+    font-size: 18px;
+    line-height: 1;
+    transition: color .15s;
+  }
+  .btn-icon:active { color: var(--text); }
+
+  /* ── VEHICLE CARDS ── */
+  #vehicle-list {
+    padding: 16px 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .vehicle-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: border-color .15s;
+    position: relative;
+  }
+  .vehicle-card:active { border-color: var(--accent); }
+
+  .card-left { flex: 1; min-width: 0; }
+  .card-year { font-size: 12px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 3px; }
+  .card-name { font-size: 19px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-mpg {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .card-mpg strong { color: var(--accent); font-size: 15px; }
+
+  .card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+
+  /* ── EMPTY STATE ── */
+  #empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  #empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  #empty-state p { font-size: 15px; line-height: 1.5; }
+
+  /* ── ADD VEHICLE FAB ── */
+  #add-vehicle-fab {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #0d0d0f;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(232,164,48,.4);
+    transition: transform .15s;
+    z-index: 20;
+  }
+  #add-vehicle-fab:active { transform: scale(.93); }
+
+  /* ── SCREENS (slide-over) ── */
+  .screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 50;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform .25s cubic-bezier(.4,0,.2,1);
+  }
+  .screen.open { transform: translateX(0); }
+
+  .screen-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 16px 14px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 5;
+  }
+  .screen-header h2 { font-size: 18px; font-weight: 700; flex: 1; }
+
+  /* ── FORMS ── */
+  .form-body { padding: 20px 16px; display: flex; flex-direction: column; gap: 16px; }
+
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 6px;
+  }
+  .field input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 16px;
+    font-family: var(--font);
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .field input:focus { border-color: var(--accent); }
+  .field input::placeholder { color: var(--muted); }
+
+  .form-row { display: flex; gap: 12px; }
+  .form-row .field { flex: 1; }
+
+  /* ── LOG ENTRY SCREEN ── */
+  #log-recap {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .recap-icon { font-size: 28px; }
+  .recap-detail {}
+  .recap-year { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+  .recap-name { font-size: 17px; font-weight: 700; }
+  .recap-mpg { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .recap-mpg strong { color: var(--accent); }
+
+  /* ── HISTORY ── */
+  #history-list { padding: 0 16px 20px; }
+
+  .fillup-row {
+    display: flex;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .fillup-row:last-child { border-bottom: none; }
+
+  .fillup-info { flex: 1; min-width: 0; }
+  .fillup-date { font-size: 12px; color: var(--muted); margin-bottom: 3px; }
+  .fillup-stats { font-size: 14px; font-weight: 600; }
+  .fillup-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .fillup-mpg {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+    text-align: right;
+    min-width: 60px;
+  }
+  .fillup-mpg small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; }
+
+  .history-export-bar {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── EDIT FILLUP MODAL ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.7);
+    z-index: 100;
+    display: none;
+    align-items: flex-end;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius) var(--radius) 0 0;
+    width: 100%;
+    padding: 20px 16px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 90dvh;
+    overflow-y: auto;
+  }
+  .modal h3 { font-size: 17px; font-weight: 700; }
+
+  /* ── MISC ── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    padding: 16px 16px 8px;
+  }
+
+  .no-fillups {
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 20px;
+    font-size: 14px;
+  }
+
+  .delete-zone {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+
+  /* ── CHECKBOX ROW ── */
+  .check-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    cursor: pointer;
+  }
+  .check-row input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .check-row .check-label { font-size: 15px; font-weight: 500; line-height: 1.3; }
+  .check-row .check-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .tag-partial {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+
+<!-- ════ MAIN SCREEN ════ -->
+<header>
+  <h1>Fuel<span>Log</span></h1>
+</header>
+
+<div id="vehicle-list"></div>
+<div id="empty-state" style="display:none">
+  <div class="empty-icon">⛽</div>
+  <p>No vehicles yet.<br>Tap <strong>+</strong> to add your first.</p>
+</div>
+
+<button id="add-vehicle-fab" onclick="openAddVehicle()">+</button>
+
+<!-- ════ ADD / EDIT VEHICLE SCREEN ════ -->
+<div class="screen" id="screen-vehicle">
+  <div class="screen-header">
+    <button class="btn-icon" onclick="closeScreen('screen-vehicle')">←</button>
+    <h2 id="vehicle-screen-title">Add Vehicle</h2>
+  </div>
+  <div class="form-body">
+    <div class="form-row">
+      <div class="field">
+        <label>Year</label>
+        <input id="v-year" type="number" placeholder="2004" inputmode="numeric" maxlength="4">
+      </div>
+      <div class="field">
+        <label>Make</label>
+        <input id="v-make" type="text" placeholder="Chevy">
+      </div>
+    </div>
+    <div class="field">
+      <label>Model</label>
+      <input id="v-model" type="text" placeholder="Silverado">
+    </div>
+    <div class="field">
+      <label>Tank Size (gal)</label>
+      <input id="v-tank" type="number" placeholder="0" inputmode="decimal">
+    </div>
+    <div class="field" id="v-odo-field">
+      <label>Starting Odometer (miles)</label>
+      <input id="v-odo" type="number" placeholder="0" inputmode="numeric">
+    </div>
+    <label class="check-row" id="v-full-row">
+      <input type="checkbox" id="v-tank-full" checked>
+      <div>
+        <div class="check-label">Tank is currently full</div>
+        <div class="check-sub">Sets this as the anchor for your first MPG calculation</div>
+      </div>
+    </label>
+    <button class="btn btn-primary" id="save-vehicle-btn" onclick="saveVehicle()" style="margin-top:4px">Save Vehicle</button>
+    <div class="delete-zone" id="delete-vehicle-zone" style="display:none">
+      <button class="btn btn-danger" style="width:100%" onclick="deleteVehicle()">Delete Vehicle</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ LOG FILL-UP SCREEN ════ -->
+<div class="screen" id="screen-log">
+  <div class="screen-header">
+    <button class="btn-icon" onclick="closeScreen('screen-log')">←</button>
+    <h2>Log Fill-Up</h2>
+  </div>
+  <div id="log-recap">
+    <div class="recap-icon">🚗</div>
+    <div class="recap-detail">
+      <div class="recap-year" id="recap-year"></div>
+      <div class="recap-name" id="recap-name"></div>
+      <div class="recap-mpg" id="recap-mpg"></div>
+    </div>
+  </div>
+  <div class="form-body">
+    <div class="field">
+      <label>Odometer (miles)</label>
+      <input id="f-odo" type="number" placeholder="0" inputmode="numeric">
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Gallons</label>
+        <input id="f-gallons" type="number" placeholder="0" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label>Price per Gallon</label>
+        <input id="f-ppg" type="number" placeholder="0" inputmode="decimal" step="0.001">
+      </div>
+    </div>
+    <label class="check-row">
+      <input type="checkbox" id="f-complete" checked>
+      <div>
+        <div class="check-label">Complete fill-up</div>
+        <div class="check-sub">Uncheck if you only partially filled the tank</div>
+      </div>
+    </label>
+    <button class="btn btn-primary" onclick="saveLog()" style="margin-top:4px">Save Fill-Up</button>
+  </div>
+</div>
+
+<!-- ════ HISTORY SCREEN ════ -->
+<div class="screen" id="screen-history">
+  <div class="screen-header">
+    <button class="btn-icon" onclick="closeScreen('screen-history')">←</button>
+    <h2 id="history-title">Fill-Up History</h2>
+  </div>
+  <div class="history-export-bar">
+    <button class="btn btn-ghost" style="width:100%" onclick="exportCSV()">Export CSV</button>
+  </div>
+  <div id="history-list"></div>
+</div>
+
+<!-- ════ EDIT FILL-UP MODAL ════ -->
+<div class="modal-overlay" id="modal-edit" onclick="closeEditModal(event)">
+  <div class="modal">
+    <h3>Edit Fill-Up</h3>
+    <div class="field">
+      <label>Odometer (miles)</label>
+      <input id="e-odo" type="number" inputmode="numeric">
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Gallons</label>
+        <input id="e-gallons" type="number" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label>Price per Gallon</label>
+        <input id="e-ppg" type="number" inputmode="decimal" step="0.001">
+      </div>
+    </div>
+    <label class="check-row" style="margin-top:4px">
+      <input type="checkbox" id="e-complete" checked>
+      <div>
+        <div class="check-label">Complete fill-up</div>
+        <div class="check-sub">Uncheck if this was a partial fill</div>
+      </div>
+    </label>
+    <button class="btn btn-primary" onclick="saveEditLog()">Save Changes</button>
+    <button class="btn btn-danger" onclick="deleteFillup()">Delete Fill-Up</button>
+    <button class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
+  </div>
+</div>
+
+<script>
+// ════ STATE ════
+let state = { vehicles: [] };
+let activeVehicleId = null;
+let editingFillupIdx = null;
+let editingVehicleId = null;
+
+function loadState() {
+  try { state = JSON.parse(localStorage.getItem('fuellog') || '{"vehicles":[]}'); }
+  catch { state = { vehicles: [] }; }
+}
+function saveState() {
+  localStorage.setItem('fuellog', JSON.stringify(state));
+}
+
+// ════ VEHICLE HELPERS ════
+function getVehicle(id) { return state.vehicles.find(v => v.id === id); }
+function vehicleDisplayName(v) { return `${v.make} ${v.model}`; }
+
+// Returns the MPG and gallons for a given fill-up index, accounting for partials.
+// A full fill-up's MPG = miles since last full fill-up / (all gallons since last full fill-up).
+// Partials contribute gallons but produce no MPG themselves.
+function fillupMPG(v, idx) {
+  const curr = v.fillups[idx];
+  if (!curr.complete) return null; // partial never has MPG
+
+  // Walk backwards to find the last full fill-up (or anchor) before this one
+  let gallonsAccum = curr.gallons;
+  let prevFullIdx = null;
+  for (let i = idx - 1; i >= 0; i--) {
+    const f = v.fillups[i];
+    if (!f.complete) {
+      gallonsAccum += f.gallons; // accumulate partials
+      continue;
+    }
+    // Found the previous full fill-up
+    prevFullIdx = i;
+    break;
+  }
+
+  if (prevFullIdx === null) return null; // no prior full anchor
+  const miles = curr.odo - v.fillups[prevFullIdx].odo;
+  if (miles <= 0 || gallonsAccum <= 0) return null;
+  return (miles / gallonsAccum).toFixed(1);
+}
+
+// Miles driven for a history row: odo delta from previous entry (any type)
+function milesDriven(v, idx) {
+  if (idx === 0) return null;
+  const miles = v.fillups[idx].odo - v.fillups[idx - 1].odo;
+  return miles > 0 ? miles : null;
+}
+
+// Lifetime avg: total miles between consecutive full fill-ups / total gallons (incl partials between them)
+function calcStats(v) {
+  const fills = v.fillups;
+  if (fills.length < 2) return { avgMPG: null, costPerMile: null };
+
+  let totalMiles = 0, totalGallons = 0, totalCost = 0;
+
+  for (let i = 0; i < fills.length; i++) {
+    const f = fills[i];
+    // Accumulate cost for every entry
+    totalCost += f.gallons * f.ppg;
+
+    if (!f.complete) continue; // partials don't anchor a segment
+
+    // Find previous full fill-up
+    let prevFullIdx = null;
+    let gallonsAccum = f.gallons;
+    for (let j = i - 1; j >= 0; j--) {
+      if (!fills[j].complete) { gallonsAccum += fills[j].gallons; continue; }
+      prevFullIdx = j;
+      break;
+    }
+    if (prevFullIdx === null) continue;
+
+    const miles = f.odo - fills[prevFullIdx].odo;
+    if (miles <= 0) continue;
+    totalMiles += miles;
+    totalGallons += gallonsAccum;
+  }
+
+  if (totalGallons === 0 || totalMiles === 0) return { avgMPG: null, costPerMile: null };
+  return {
+    avgMPG: (totalMiles / totalGallons).toFixed(1),
+    costPerMile: (totalCost / totalMiles).toFixed(3)
+  };
+}
+
+// ════ RENDER MAIN ════
+function render() {
+  const list = document.getElementById('vehicle-list');
+  const empty = document.getElementById('empty-state');
+  list.innerHTML = '';
+  if (state.vehicles.length === 0) {
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  state.vehicles.forEach(v => {
+    const stats = calcStats(v);
+    const mpgLabel = stats.avgMPG ? `<strong>${stats.avgMPG}</strong> mpg avg` : 'No MPG yet';
+    const lastFill = v.fillups.length > 0 ? v.fillups[v.fillups.length - 1] : null;
+    const odoLabel = lastFill ? lastFill.odo.toLocaleString() + ' mi' : 'No entries yet';
+    const card = document.createElement('div');
+    card.className = 'vehicle-card';
+    card.innerHTML = `
+      <div class="card-left">
+        <div class="card-year">${v.year}</div>
+        <div class="card-name">${vehicleDisplayName(v)}</div>
+        <div class="card-mpg">${mpgLabel}</div>
+        <div class="card-mpg" style="margin-top:2px;font-size:12px">${odoLabel}</div>
+      </div>
+      <div class="card-right">
+        <button class="btn-icon" onclick="openEditVehicle(event,'${v.id}')">✏️</button>
+        <button class="btn-icon" onclick="openHistory(event,'${v.id}')">📋</button>
+      </div>
+    `;
+    card.addEventListener('click', () => openLog(v.id));
+    list.appendChild(card);
+  });
+}
+
+// ════ SCREENS ════
+function openScreen(id) { document.getElementById(id).classList.add('open'); }
+function closeScreen(id) { document.getElementById(id).classList.remove('open'); }
+
+// ════ ADD / EDIT VEHICLE ════
+function openAddVehicle() {
+  editingVehicleId = null;
+  document.getElementById('vehicle-screen-title').textContent = 'Add Vehicle';
+  document.getElementById('v-year').value = '';
+  document.getElementById('v-make').value = '';
+  document.getElementById('v-model').value = '';
+  document.getElementById('v-tank').value = '';
+  document.getElementById('v-odo').value = '';
+  document.getElementById('v-tank-full').checked = true;
+  document.getElementById('v-odo-field').style.display = 'block';
+  document.getElementById('v-full-row').style.display = 'flex';
+  document.getElementById('delete-vehicle-zone').style.display = 'none';
+  openScreen('screen-vehicle');
+}
+
+function openEditVehicle(e, id) {
+  e.stopPropagation();
+  editingVehicleId = id;
+  const v = getVehicle(id);
+  document.getElementById('vehicle-screen-title').textContent = 'Edit Vehicle';
+  document.getElementById('v-year').value = v.year;
+  document.getElementById('v-make').value = v.make;
+  document.getElementById('v-model').value = v.model;
+  document.getElementById('v-tank').value = v.tank;
+  // Hide odometer/full-tank fields when editing — those only matter at creation
+  document.getElementById('v-odo-field').style.display = 'none';
+  document.getElementById('v-full-row').style.display = 'none';
+  document.getElementById('delete-vehicle-zone').style.display = 'block';
+  openScreen('screen-vehicle');
+}
+
+function saveVehicle() {
+  const year = document.getElementById('v-year').value.trim();
+  const make = document.getElementById('v-make').value.trim();
+  const model = document.getElementById('v-model').value.trim();
+  const tank = document.getElementById('v-tank').value.trim();
+  if (!year || !make || !model) { alert('Year, make, and model are required.'); return; }
+
+  if (editingVehicleId) {
+    const v = getVehicle(editingVehicleId);
+    v.year = year; v.make = make; v.model = model; v.tank = tank;
+  } else {
+    const odoVal = parseFloat(document.getElementById('v-odo').value);
+    const isFull = document.getElementById('v-tank-full').checked;
+    const fillups = [];
+    if (!isNaN(odoVal) && odoVal > 0 && isFull) {
+      // Anchor entry: no gallons, no cost, just an odometer stake in the ground
+      fillups.push({ ts: Date.now(), odo: odoVal, gallons: 0, ppg: 0, complete: true, anchor: true });
+    }
+    state.vehicles.push({ id: Date.now().toString(), year, make, model, tank, fillups });
+  }
+  saveState();
+  render();
+  closeScreen('screen-vehicle');
+}
+
+function deleteVehicle() {
+  if (!confirm('Delete this vehicle and all its fill-up history?')) return;
+  state.vehicles = state.vehicles.filter(v => v.id !== editingVehicleId);
+  saveState();
+  render();
+  closeScreen('screen-vehicle');
+}
+
+// ════ LOG FILL-UP ════
+function openLog(id) {
+  activeVehicleId = id;
+  const v = getVehicle(id);
+  const stats = calcStats(v);
+  document.getElementById('recap-year').textContent = v.year;
+  document.getElementById('recap-name').textContent = vehicleDisplayName(v);
+  document.getElementById('recap-mpg').innerHTML = stats.avgMPG
+    ? `Avg <strong>${stats.avgMPG}</strong> mpg`
+    : 'No MPG yet';
+  document.getElementById('f-odo').value = '';
+  document.getElementById('f-gallons').value = '';
+  document.getElementById('f-ppg').value = '';
+  document.getElementById('f-complete').checked = true;
+  openScreen('screen-log');
+}
+
+function saveLog() {
+  const odo = parseFloat(document.getElementById('f-odo').value);
+  const gallons = parseFloat(document.getElementById('f-gallons').value);
+  const ppg = parseFloat(document.getElementById('f-ppg').value);
+  const complete = document.getElementById('f-complete').checked;
+  if (isNaN(odo) || isNaN(gallons) || isNaN(ppg)) { alert('All fields are required.'); return; }
+  if (gallons <= 0) { alert('Gallons must be greater than 0.'); return; }
+
+  const v = getVehicle(activeVehicleId);
+  const lastFill = v.fillups[v.fillups.length - 1];
+  if (lastFill && odo <= lastFill.odo) { alert('Odometer must be greater than your last entry.'); return; }
+
+  v.fillups.push({ ts: Date.now(), odo, gallons, ppg, complete });
+  saveState();
+  render();
+  closeScreen('screen-log');
+}
+
+// ════ HISTORY ════
+function openHistory(e, id) {
+  e.stopPropagation();
+  activeVehicleId = id;
+  const v = getVehicle(id);
+  document.getElementById('history-title').textContent = vehicleDisplayName(v);
+  renderHistory(v);
+  openScreen('screen-history');
+}
+
+function renderHistory(v) {
+  const list = document.getElementById('history-list');
+
+  // Filter out silent anchor entries from the visible list
+  const visible = v.fillups
+    .map((f, i) => ({ ...f, origIdx: i }))
+    .filter(f => !f.anchor)
+    .reverse();
+
+  if (visible.length === 0) {
+    list.innerHTML = '<div class="no-fillups">No fill-ups logged yet.</div>';
+    return;
+  }
+  list.innerHTML = '';
+
+  visible.forEach(f => {
+    const mpg = f.complete ? fillupMPG(v, f.origIdx) : null;
+    const miles = milesDriven(v, f.origIdx);
+    const date = new Date(f.ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const time = new Date(f.ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    const cost = (f.gallons * f.ppg).toFixed(2);
+    const partialTag = !f.complete ? '<span class="tag-partial">Partial</span>' : '';
+    const milesLabel = miles !== null ? `${miles.toLocaleString()} mi traveled` : '— mi traveled';
+
+    const row = document.createElement('div');
+    row.className = 'fillup-row';
+    row.innerHTML = `
+      <div class="fillup-info">
+        <div class="fillup-date">${date} · ${time}${partialTag}</div>
+        <div class="fillup-stats">${milesLabel} · ${f.odo.toLocaleString()} mi total · ${f.gallons} gal · $${f.ppg.toFixed(3)}/gal</div>
+        <div class="fillup-sub">Total: $${cost}</div>
+      </div>
+      <div class="fillup-mpg">
+        ${mpg ? mpg : '—'}
+        <small>${mpg ? 'mpg' : (f.complete ? 'no anchor' : 'partial')}</small>
+      </div>
+      <button class="btn-icon" onclick="openEditModal('${v.id}', ${f.origIdx})">✏️</button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+// ════ EDIT FILL-UP MODAL ════
+function openEditModal(vid, idx) {
+  activeVehicleId = vid;
+  editingFillupIdx = idx;
+  const v = getVehicle(vid);
+  const f = v.fillups[idx];
+  document.getElementById('e-odo').value = f.odo;
+  document.getElementById('e-gallons').value = f.gallons;
+  document.getElementById('e-ppg').value = f.ppg;
+  document.getElementById('e-complete').checked = f.complete !== false;
+  document.getElementById('modal-edit').classList.add('open');
+}
+
+function closeEditModal(e) {
+  if (e && e.target !== document.getElementById('modal-edit')) return;
+  document.getElementById('modal-edit').classList.remove('open');
+}
+
+function saveEditLog() {
+  const odo = parseFloat(document.getElementById('e-odo').value);
+  const gallons = parseFloat(document.getElementById('e-gallons').value);
+  const ppg = parseFloat(document.getElementById('e-ppg').value);
+  const complete = document.getElementById('e-complete').checked;
+  if (isNaN(odo) || isNaN(gallons) || isNaN(ppg)) { alert('All fields are required.'); return; }
+
+  const v = getVehicle(activeVehicleId);
+  Object.assign(v.fillups[editingFillupIdx], { odo, gallons, ppg, complete });
+  saveState();
+  render();
+  renderHistory(v);
+  document.getElementById('modal-edit').classList.remove('open');
+}
+
+function deleteFillup() {
+  if (!confirm('Delete this fill-up?')) return;
+  const v = getVehicle(activeVehicleId);
+  v.fillups.splice(editingFillupIdx, 1);
+  saveState();
+  render();
+  renderHistory(v);
+  document.getElementById('modal-edit').classList.remove('open');
+}
+
+// ════ CSV EXPORT ════
+function exportCSV() {
+  const v = getVehicle(activeVehicleId);
+  const rows = [['Date', 'Time', 'Miles Traveled', 'Odometer', 'Gallons', 'Price Per Gallon', 'Total Cost', 'MPG', 'Type']];
+  v.fillups.filter(f => !f.anchor).forEach((f, _, arr) => {
+    const origIdx = v.fillups.indexOf(f);
+    const d = new Date(f.ts);
+    const mpg = f.complete ? fillupMPG(v, origIdx) : null;
+    const miles = milesDriven(v, origIdx);
+    rows.push([
+      d.toLocaleDateString('en-US'),
+      d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+      miles !== null ? miles : '',
+      f.odo,
+      f.gallons,
+      f.ppg.toFixed(3),
+      (f.gallons * f.ppg).toFixed(2),
+      mpg || '',
+      f.complete ? 'Full' : 'Partial'
+    ]);
+  });
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${v.year}-${v.make}-${v.model}-fillups.csv`.replace(/\s+/g, '-');
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ════ INIT ════
+loadState();
+render();
+</script>
+</body>
+</html>
