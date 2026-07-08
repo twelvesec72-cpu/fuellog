@@ -6,19 +6,24 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>FuelLog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:       #0d0d0f;
-    --surface:  #18181c;
-    --border:   #2a2a30;
-    --accent:   #e8a430;
-    --accent-dim: #7a5418;
-    --text:     #f0f0f0;
-    --muted:    #888;
-    --danger:   #c0392b;
-    --green:    #27ae60;
-    --radius:   14px;
-    --font:     -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --bg:        #0b0b0d;
+    --surface:   #131318;
+    --surface-2: #1a1a20;
+    --border:    #26262c;
+    --border-hi: #3a3a42;
+    --accent:    #e8a430;
+    --accent-dim:#6d4d15;
+    --text:      #f2f2f0;
+    --muted:     #8a8a92;
+    --muted-2:   #6a6a72;
+    --danger:    #d1483c;
+    --radius:    14px;
+    --font:      'Chakra Petch', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -30,7 +35,7 @@
     min-height: 100dvh;
     max-width: 480px;
     margin: 0 auto;
-    padding-bottom: 80px;
+    padding-bottom: 90px;
   }
 
   /* ── HEADER ── */
@@ -38,7 +43,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 20px 12px;
+    padding: 18px 18px 14px;
     position: sticky;
     top: 0;
     background: var(--bg);
@@ -46,110 +51,115 @@
     border-bottom: 1px solid var(--border);
   }
   header h1 {
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 700;
-    letter-spacing: -0.3px;
+    letter-spacing: 2.5px;
   }
   header h1 span { color: var(--accent); }
+  .signal { display: flex; gap: 3px; align-items: flex-end; }
+  .signal i { display: block; width: 3px; background: var(--border-hi); border-radius: 1px; }
+  .signal i:nth-child(1) { height: 7px; }
+  .signal i:nth-child(2) { height: 11px; }
+  .signal i:nth-child(3) { height: 15px; background: var(--accent); }
 
   /* ── BUTTONS ── */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 10px 18px;
-    border-radius: 10px;
+    gap: 7px;
+    padding: 12px 18px;
+    border-radius: 11px;
     border: none;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
+    letter-spacing: .5px;
     cursor: pointer;
     font-family: var(--font);
     transition: opacity .15s;
   }
   .btn:active { opacity: .7; }
-  .btn-primary { background: var(--accent); color: #0d0d0f; }
+  .btn-primary { background: var(--accent); color: #0b0b0d; }
   .btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
   .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
   .btn-icon {
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--muted);
+    color: var(--muted-2);
     padding: 6px;
     border-radius: 8px;
-    font-size: 18px;
+    font-size: 19px;
     line-height: 1;
     transition: color .15s;
   }
-  .btn-icon:active { color: var(--text); }
+  .btn-icon:active { color: var(--accent); }
 
   /* ── VEHICLE CARDS ── */
   #vehicle-list {
-    padding: 16px 16px 0;
+    padding: 14px 14px 0;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 11px;
   }
 
   .vehicle-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 18px;
+    padding: 14px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 14px;
     cursor: pointer;
     transition: border-color .15s;
-    position: relative;
   }
   .vehicle-card:active { border-color: var(--accent); }
 
-  .card-left { flex: 1; min-width: 0; }
-  .card-year { font-size: 12px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 3px; }
-  .card-name { font-size: 19px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .card-mpg {
-    font-size: 13px;
-    color: var(--muted);
-    margin-top: 4px;
-  }
-  .card-mpg strong { color: var(--accent); font-size: 15px; }
+  .gauge { flex-shrink: 0; }
 
-  .card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .card-mid { flex: 1; min-width: 0; }
+  .card-year { font-size: 10px; color: var(--muted); font-weight: 500; letter-spacing: 1.5px; }
+  .card-name { font-size: 17px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 1px 0 6px; }
+  .card-odo { font-size: 13px; color: var(--accent); font-weight: 500; }
+  .card-odo span { color: var(--muted); font-weight: 400; font-size: 11px; }
+  .card-days { font-size: 11px; color: var(--muted); margin-top: 3px; display: flex; align-items: center; gap: 4px; }
+
+  .card-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
 
   /* ── EMPTY STATE ── */
   #empty-state {
     text-align: center;
-    padding: 60px 20px;
+    padding: 70px 20px;
     color: var(--muted);
   }
-  #empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
-  #empty-state p { font-size: 15px; line-height: 1.5; }
+  #empty-state .empty-icon { font-size: 46px; margin-bottom: 16px; }
+  #empty-state p { font-size: 15px; line-height: 1.6; }
 
-  /* ── ADD VEHICLE FAB ── */
+  /* ── FAB ── */
   #add-vehicle-fab {
     position: fixed;
     bottom: 24px;
     right: 24px;
-    width: 56px;
-    height: 56px;
+    width: 58px;
+    height: 58px;
     border-radius: 50%;
     background: var(--accent);
-    color: #0d0d0f;
+    color: #0b0b0d;
     border: none;
-    font-size: 28px;
+    font-size: 30px;
+    font-weight: 400;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 20px rgba(232,164,48,.4);
+    box-shadow: 0 4px 22px rgba(232,164,48,.38);
     transition: transform .15s;
     z-index: 20;
   }
-  #add-vehicle-fab:active { transform: scale(.93); }
+  #add-vehicle-fab:active { transform: scale(.92); }
 
-  /* ── SCREENS (slide-over) ── */
+  /* ── SCREENS ── */
   .screen {
     position: fixed;
     inset: 0;
@@ -158,32 +168,41 @@
     overflow-y: auto;
     transform: translateX(100%);
     transition: transform .25s cubic-bezier(.4,0,.2,1);
+    max-width: 480px;
+    margin: 0 auto;
   }
   .screen.open { transform: translateX(0); }
 
   .screen-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 20px 16px 14px;
+    gap: 10px;
+    padding: 18px 14px 14px;
     border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
     background: var(--bg);
     z-index: 5;
   }
-  .screen-header h2 { font-size: 18px; font-weight: 700; flex: 1; }
+  .screen-header h2 { font-size: 16px; font-weight: 600; letter-spacing: 1px; flex: 1; }
 
   /* ── FORMS ── */
-  .form-body { padding: 20px 16px; display: flex; flex-direction: column; gap: 16px; }
+  .form-body { padding: 18px 16px; display: flex; flex-direction: column; gap: 15px; }
+
+  .section-tag {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 1.8px;
+    margin-bottom: -4px;
+  }
 
   .field label {
     display: block;
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 600;
     color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: .5px;
+    letter-spacing: 1.2px;
     margin-bottom: 6px;
   }
   .field input {
@@ -194,17 +213,23 @@
     color: var(--text);
     font-size: 16px;
     font-family: var(--font);
+    font-weight: 500;
     padding: 12px 14px;
     outline: none;
     transition: border-color .15s;
   }
   .field input:focus { border-color: var(--accent); }
-  .field input::placeholder { color: var(--muted); }
+  .field input::placeholder { color: var(--muted-2); font-weight: 400; }
 
-  .form-row { display: flex; gap: 12px; }
-  .form-row .field { flex: 1; }
+  .field.computed label { color: var(--accent); }
+  .field.computed input { border-color: var(--accent); color: var(--accent); }
 
-  /* ── LOG ENTRY SCREEN ── */
+  .form-row { display: flex; gap: 10px; }
+  .form-row .field { flex: 1; min-width: 0; }
+
+  .hint { font-size: 11px; color: var(--muted); margin-top: -6px; }
+
+  /* ── LOG RECAP ── */
   #log-recap {
     background: var(--surface);
     border-bottom: 1px solid var(--border);
@@ -213,92 +238,13 @@
     align-items: center;
     gap: 14px;
   }
-  .recap-icon { font-size: 28px; }
-  .recap-detail {}
-  .recap-year { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
-  .recap-name { font-size: 17px; font-weight: 700; }
-  .recap-mpg { font-size: 13px; color: var(--muted); margin-top: 2px; }
-  .recap-mpg strong { color: var(--accent); }
+  .recap-detail { min-width: 0; }
+  .recap-year { font-size: 10px; color: var(--muted); font-weight: 500; letter-spacing: 1.5px; }
+  .recap-name { font-size: 17px; font-weight: 600; margin: 1px 0; }
+  .recap-mpg { font-size: 12px; color: var(--muted); }
+  .recap-mpg strong { color: var(--accent); font-weight: 600; }
 
-  /* ── HISTORY ── */
-  #history-list { padding: 0 16px 20px; }
-
-  .fillup-row {
-    display: flex;
-    align-items: center;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--border);
-    gap: 12px;
-  }
-  .fillup-row:last-child { border-bottom: none; }
-
-  .fillup-info { flex: 1; min-width: 0; }
-  .fillup-date { font-size: 12px; color: var(--muted); margin-bottom: 3px; }
-  .fillup-stats { font-size: 14px; font-weight: 600; }
-  .fillup-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-
-  .fillup-mpg {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--accent);
-    white-space: nowrap;
-    text-align: right;
-    min-width: 60px;
-  }
-  .fillup-mpg small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; }
-
-  .history-export-bar {
-    padding: 16px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  /* ── EDIT FILLUP MODAL ── */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.7);
-    z-index: 100;
-    display: none;
-    align-items: flex-end;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--surface);
-    border-radius: var(--radius) var(--radius) 0 0;
-    width: 100%;
-    padding: 20px 16px 40px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    max-height: 90dvh;
-    overflow-y: auto;
-  }
-  .modal h3 { font-size: 17px; font-weight: 700; }
-
-  /* ── MISC ── */
-  .section-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: .7px;
-    padding: 16px 16px 8px;
-  }
-
-  .no-fillups {
-    text-align: center;
-    color: var(--muted);
-    padding: 40px 20px;
-    font-size: 14px;
-  }
-
-  .delete-zone {
-    padding: 16px;
-    border-top: 1px solid var(--border);
-    margin-top: 8px;
-  }
-
-  /* ── CHECKBOX ROW ── */
+  /* ── CHECKBOX ── */
   .check-row {
     display: flex;
     align-items: center;
@@ -306,39 +252,115 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 14px;
+    padding: 13px 14px;
     cursor: pointer;
   }
   .check-row input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
+    width: 20px; height: 20px;
     accent-color: var(--accent);
-    cursor: pointer;
-    flex-shrink: 0;
+    cursor: pointer; flex-shrink: 0;
   }
-  .check-row .check-label { font-size: 15px; font-weight: 500; line-height: 1.3; }
-  .check-row .check-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .check-label { font-size: 14px; font-weight: 500; line-height: 1.3; }
+  .check-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: flex;
+    gap: 6px;
+    padding: 14px 14px 4px;
+  }
+  .stat-cell {
+    flex: 1;
+    text-align: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 10px 4px;
+    min-width: 0;
+  }
+  .stat-val { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; }
+  .stat-val.accent { color: var(--accent); }
+  .stat-label { font-size: 8px; color: var(--muted); letter-spacing: 1px; margin-top: 3px; }
+
+  .export-row { padding: 12px 14px; }
+
+  /* ── HISTORY LIST ── */
+  #history-list { padding: 0 14px 20px; }
+
+  .fillup-row {
+    display: flex;
+    align-items: center;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .fillup-row:last-child { border-bottom: none; }
+
+  .fillup-info { flex: 1; min-width: 0; }
+  .fillup-date { font-size: 11px; color: var(--muted); margin-bottom: 3px; display: flex; align-items: center; gap: 6px; }
+  .fillup-lead { font-size: 15px; font-weight: 600; }
+  .fillup-lead span { color: var(--muted); font-weight: 400; font-size: 12px; }
+  .fillup-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .fillup-mpg {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+    text-align: right;
+    min-width: 52px;
+  }
+  .fillup-mpg small { display: block; font-size: 9px; color: var(--muted); font-weight: 400; letter-spacing: .5px; }
 
   .tag-partial {
     display: inline-block;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
-    text-transform: uppercase;
     letter-spacing: .5px;
     background: var(--accent-dim);
     color: var(--accent);
     border-radius: 4px;
     padding: 2px 6px;
-    margin-left: 6px;
-    vertical-align: middle;
   }
+
+  .no-fillups { text-align: center; color: var(--muted); padding: 44px 20px; font-size: 14px; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.72);
+    z-index: 100;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: var(--radius) var(--radius) 0 0;
+    width: 100%;
+    max-width: 480px;
+    padding: 18px 16px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    max-height: 90dvh;
+    overflow-y: auto;
+  }
+  .modal h3 { font-size: 16px; font-weight: 600; letter-spacing: 1px; }
+
+  .delete-zone { padding: 16px; border-top: 1px solid var(--border); margin-top: 6px; }
 </style>
 </head>
 <body>
 
-<!-- ════ MAIN SCREEN ════ -->
+<!-- ═══ MAIN ═══ -->
 <header>
-  <h1>Fuel<span>Log</span></h1>
+  <h1>FUEL<span>LOG</span></h1>
+  <div class="signal"><i></i><i></i><i></i></div>
 </header>
 
 <div id="vehicle-list"></div>
@@ -349,33 +371,33 @@
 
 <button id="add-vehicle-fab" onclick="openAddVehicle()">+</button>
 
-<!-- ════ ADD / EDIT VEHICLE SCREEN ════ -->
+<!-- ═══ ADD / EDIT VEHICLE ═══ -->
 <div class="screen" id="screen-vehicle">
   <div class="screen-header">
     <button class="btn-icon" onclick="closeScreen('screen-vehicle')">←</button>
-    <h2 id="vehicle-screen-title">Add Vehicle</h2>
+    <h2 id="vehicle-screen-title">ADD VEHICLE</h2>
   </div>
   <div class="form-body">
     <div class="form-row">
       <div class="field">
-        <label>Year</label>
-        <input id="v-year" type="number" placeholder="2004" inputmode="numeric" maxlength="4">
+        <label>YEAR</label>
+        <input id="v-year" type="number" placeholder="2004" inputmode="numeric">
       </div>
       <div class="field">
-        <label>Make</label>
+        <label>MAKE</label>
         <input id="v-make" type="text" placeholder="Chevy">
       </div>
     </div>
     <div class="field">
-      <label>Model</label>
+      <label>MODEL</label>
       <input id="v-model" type="text" placeholder="Silverado">
     </div>
     <div class="field">
-      <label>Tank Size (gal)</label>
+      <label>TANK SIZE (GAL)</label>
       <input id="v-tank" type="number" placeholder="0" inputmode="decimal">
     </div>
     <div class="field" id="v-odo-field">
-      <label>Starting Odometer (miles)</label>
+      <label>STARTING ODOMETER (MI)</label>
       <input id="v-odo" type="number" placeholder="0" inputmode="numeric">
     </div>
     <label class="check-row" id="v-full-row">
@@ -385,21 +407,21 @@
         <div class="check-sub">Sets this as the anchor for your first MPG calculation</div>
       </div>
     </label>
-    <button class="btn btn-primary" id="save-vehicle-btn" onclick="saveVehicle()" style="margin-top:4px">Save Vehicle</button>
+    <button class="btn btn-primary" onclick="saveVehicle()" style="margin-top:2px">SAVE VEHICLE</button>
     <div class="delete-zone" id="delete-vehicle-zone" style="display:none">
-      <button class="btn btn-danger" style="width:100%" onclick="deleteVehicle()">Delete Vehicle</button>
+      <button class="btn btn-danger" style="width:100%" onclick="deleteVehicle()">DELETE VEHICLE</button>
     </div>
   </div>
 </div>
 
-<!-- ════ LOG FILL-UP SCREEN ════ -->
+<!-- ═══ LOG FILL-UP ═══ -->
 <div class="screen" id="screen-log">
   <div class="screen-header">
     <button class="btn-icon" onclick="closeScreen('screen-log')">←</button>
-    <h2>Log Fill-Up</h2>
+    <h2>LOG FILL-UP</h2>
   </div>
   <div id="log-recap">
-    <div class="recap-icon">🚗</div>
+    <div class="gauge" id="recap-gauge"></div>
     <div class="recap-detail">
       <div class="recap-year" id="recap-year"></div>
       <div class="recap-name" id="recap-name"></div>
@@ -408,19 +430,25 @@
   </div>
   <div class="form-body">
     <div class="field">
-      <label>Odometer (miles)</label>
+      <label>ODOMETER (MI)</label>
       <input id="f-odo" type="number" placeholder="0" inputmode="numeric">
     </div>
+    <div class="section-tag">FUEL & COST — ENTER ANY TWO</div>
     <div class="form-row">
-      <div class="field">
-        <label>Gallons</label>
+      <div class="field" id="f-gallons-field">
+        <label>GALLONS</label>
         <input id="f-gallons" type="number" placeholder="0" inputmode="decimal">
       </div>
-      <div class="field">
-        <label>Price per Gallon</label>
+      <div class="field" id="f-ppg-field">
+        <label>$ / GAL</label>
         <input id="f-ppg" type="number" placeholder="0" inputmode="decimal" step="0.001">
       </div>
+      <div class="field computed" id="f-total-field">
+        <label>TOTAL $</label>
+        <input id="f-total" type="number" placeholder="0" inputmode="decimal" step="0.01">
+      </div>
     </div>
+    <div class="hint">The highlighted field fills itself from the other two.</div>
     <label class="check-row">
       <input type="checkbox" id="f-complete" checked>
       <div>
@@ -428,220 +456,260 @@
         <div class="check-sub">Uncheck if you only partially filled the tank</div>
       </div>
     </label>
-    <button class="btn btn-primary" onclick="saveLog()" style="margin-top:4px">Save Fill-Up</button>
+    <button class="btn btn-primary" onclick="saveLog()" style="margin-top:2px">SAVE FILL-UP</button>
   </div>
 </div>
 
-<!-- ════ HISTORY SCREEN ════ -->
+<!-- ═══ HISTORY ═══ -->
 <div class="screen" id="screen-history">
   <div class="screen-header">
     <button class="btn-icon" onclick="closeScreen('screen-history')">←</button>
-    <h2 id="history-title">Fill-Up History</h2>
+    <h2 id="history-title">HISTORY</h2>
   </div>
-  <div class="history-export-bar">
-    <button class="btn btn-ghost" style="width:100%" onclick="exportCSV()">Export CSV</button>
+  <div class="stats-bar" id="stats-bar"></div>
+  <div class="export-row">
+    <button class="btn btn-ghost" style="width:100%" onclick="exportCSV()">EXPORT CSV</button>
   </div>
   <div id="history-list"></div>
 </div>
 
-<!-- ════ EDIT FILL-UP MODAL ════ -->
+<!-- ═══ EDIT FILL-UP MODAL ═══ -->
 <div class="modal-overlay" id="modal-edit" onclick="closeEditModal(event)">
   <div class="modal">
-    <h3>Edit Fill-Up</h3>
+    <h3>EDIT FILL-UP</h3>
     <div class="field">
-      <label>Odometer (miles)</label>
+      <label>ODOMETER (MI)</label>
       <input id="e-odo" type="number" inputmode="numeric">
     </div>
+    <div class="section-tag">FUEL & COST — ENTER ANY TWO</div>
     <div class="form-row">
-      <div class="field">
-        <label>Gallons</label>
+      <div class="field" id="e-gallons-field">
+        <label>GALLONS</label>
         <input id="e-gallons" type="number" inputmode="decimal">
       </div>
-      <div class="field">
-        <label>Price per Gallon</label>
+      <div class="field" id="e-ppg-field">
+        <label>$ / GAL</label>
         <input id="e-ppg" type="number" inputmode="decimal" step="0.001">
       </div>
+      <div class="field computed" id="e-total-field">
+        <label>TOTAL $</label>
+        <input id="e-total" type="number" inputmode="decimal" step="0.01">
+      </div>
     </div>
-    <label class="check-row" style="margin-top:4px">
+    <label class="check-row">
       <input type="checkbox" id="e-complete" checked>
       <div>
         <div class="check-label">Complete fill-up</div>
         <div class="check-sub">Uncheck if this was a partial fill</div>
       </div>
     </label>
-    <button class="btn btn-primary" onclick="saveEditLog()">Save Changes</button>
-    <button class="btn btn-danger" onclick="deleteFillup()">Delete Fill-Up</button>
-    <button class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveEditLog()">SAVE CHANGES</button>
+    <button class="btn btn-danger" onclick="deleteFillup()">DELETE FILL-UP</button>
+    <button class="btn btn-ghost" onclick="closeEditModal()">CANCEL</button>
   </div>
 </div>
 
 <script>
-// ════ STATE ════
+// ═══ STATE ═══
 let state = { vehicles: [] };
 let activeVehicleId = null;
 let editingFillupIdx = null;
 let editingVehicleId = null;
+const GAUGE_MAX = 50;
 
 function loadState() {
   try { state = JSON.parse(localStorage.getItem('fuellog') || '{"vehicles":[]}'); }
   catch { state = { vehicles: [] }; }
 }
-function saveState() {
-  localStorage.setItem('fuellog', JSON.stringify(state));
-}
+function saveState() { localStorage.setItem('fuellog', JSON.stringify(state)); }
 
-// ════ VEHICLE HELPERS ════
+// ═══ HELPERS ═══
 function getVehicle(id) { return state.vehicles.find(v => v.id === id); }
-function vehicleDisplayName(v) { return `${v.make} ${v.model}`; }
+function vehicleDisplayName(v) { return v.make + ' ' + v.model; }
 
-// Returns the MPG and gallons for a given fill-up index, accounting for partials.
-// A full fill-up's MPG = miles since last full fill-up / (all gallons since last full fill-up).
-// Partials contribute gallons but produce no MPG themselves.
+// Per-fill-up MPG, accounting for partials: miles since last full fill-up / gallons since last full fill-up.
 function fillupMPG(v, idx) {
   const curr = v.fillups[idx];
-  if (!curr.complete) return null; // partial never has MPG
-
-  // Walk backwards to find the last full fill-up (or anchor) before this one
+  if (!curr.complete) return null;
   let gallonsAccum = curr.gallons;
   let prevFullIdx = null;
   for (let i = idx - 1; i >= 0; i--) {
     const f = v.fillups[i];
-    if (!f.complete) {
-      gallonsAccum += f.gallons; // accumulate partials
-      continue;
-    }
-    // Found the previous full fill-up
+    if (!f.complete) { gallonsAccum += f.gallons; continue; }
     prevFullIdx = i;
     break;
   }
-
-  if (prevFullIdx === null) return null; // no prior full anchor
+  if (prevFullIdx === null) return null;
   const miles = curr.odo - v.fillups[prevFullIdx].odo;
   if (miles <= 0 || gallonsAccum <= 0) return null;
   return (miles / gallonsAccum).toFixed(1);
 }
 
-// Miles driven for a history row: odo delta from previous entry (any type)
 function milesDriven(v, idx) {
   if (idx === 0) return null;
   const miles = v.fillups[idx].odo - v.fillups[idx - 1].odo;
   return miles > 0 ? miles : null;
 }
 
-// Lifetime avg: total miles between consecutive full fill-ups / total gallons (incl partials between them)
 function calcStats(v) {
   const fills = v.fillups;
-  if (fills.length < 2) return { avgMPG: null, costPerMile: null };
-
   let totalMiles = 0, totalGallons = 0, totalCost = 0;
-
   for (let i = 0; i < fills.length; i++) {
     const f = fills[i];
-    // Accumulate cost for every entry
     totalCost += f.gallons * f.ppg;
-
-    if (!f.complete) continue; // partials don't anchor a segment
-
-    // Find previous full fill-up
-    let prevFullIdx = null;
-    let gallonsAccum = f.gallons;
+    if (!f.complete) continue;
+    let prevFullIdx = null, gallonsAccum = f.gallons;
     for (let j = i - 1; j >= 0; j--) {
       if (!fills[j].complete) { gallonsAccum += fills[j].gallons; continue; }
-      prevFullIdx = j;
-      break;
+      prevFullIdx = j; break;
     }
     if (prevFullIdx === null) continue;
-
     const miles = f.odo - fills[prevFullIdx].odo;
     if (miles <= 0) continue;
     totalMiles += miles;
     totalGallons += gallonsAccum;
   }
-
-  if (totalGallons === 0 || totalMiles === 0) return { avgMPG: null, costPerMile: null };
-  return {
-    avgMPG: (totalMiles / totalGallons).toFixed(1),
-    costPerMile: (totalCost / totalMiles).toFixed(3)
-  };
+  const avgMPG = (totalGallons > 0 && totalMiles > 0) ? (totalMiles / totalGallons).toFixed(1) : null;
+  const costPerMile = (totalMiles > 0) ? (totalCost / totalMiles).toFixed(3) : null;
+  return { avgMPG, costPerMile, totalMiles, totalCost };
 }
 
-// ════ RENDER MAIN ════
+// Last entry of any kind (for current odometer)
+function lastEntry(v) { return v.fillups.length ? v.fillups[v.fillups.length - 1] : null; }
+// Last real fuel entry (gallons > 0) for "days since fill-up"
+function lastFuelEntry(v) {
+  for (let i = v.fillups.length - 1; i >= 0; i--) if (v.fillups[i].gallons > 0) return v.fillups[i];
+  return null;
+}
+function daysSince(ts) { return Math.floor((Date.now() - ts) / 86400000); }
+function daysLabel(ts) {
+  const d = daysSince(ts);
+  if (d <= 0) return 'Today';
+  if (d === 1) return '1 day since fill-up';
+  return d + ' days since fill-up';
+}
+
+// ═══ GAUGE ═══
+function gaugeSVG(mpg, size) {
+  const val = mpg ? parseFloat(mpg) : 0;
+  const dash = (Math.min(val / GAUGE_MAX, 1) * 100).toFixed(1);
+  const display = mpg ? mpg : '—';
+  const fg = mpg
+    ? '<path d="M 15 78 A 42 42 0 1 1 85 78" pathLength="100" fill="none" stroke="#e8a430" stroke-width="7" stroke-linecap="round" stroke-dasharray="' + dash + ' 100"/>'
+    : '';
+  return '<svg viewBox="0 0 100 100" width="' + size + '" height="' + size + '">' +
+    '<path d="M 15 78 A 42 42 0 1 1 85 78" pathLength="100" fill="none" stroke="#26262c" stroke-width="7" stroke-linecap="round"/>' +
+    fg +
+    '<g stroke="#4a4a52" stroke-width="1.5"><line x1="50" y1="8" x2="50" y2="14"/><line x1="20" y1="32" x2="25" y2="36"/><line x1="80" y1="32" x2="75" y2="36"/></g>' +
+    '<text x="50" y="52" text-anchor="middle" fill="#f2f2f0" font-size="21" font-weight="600" font-family="Chakra Petch,sans-serif">' + display + '</text>' +
+    '<text x="50" y="66" text-anchor="middle" fill="#8a8a92" font-size="9" letter-spacing="1" font-family="Chakra Petch,sans-serif">AVG MPG</text>' +
+    '</svg>';
+}
+
+// ═══ RENDER MAIN ═══
 function render() {
   const list = document.getElementById('vehicle-list');
   const empty = document.getElementById('empty-state');
   list.innerHTML = '';
-  if (state.vehicles.length === 0) {
-    empty.style.display = 'block';
-    return;
-  }
+  if (state.vehicles.length === 0) { empty.style.display = 'block'; return; }
   empty.style.display = 'none';
   state.vehicles.forEach(v => {
     const stats = calcStats(v);
-    const mpgLabel = stats.avgMPG ? `<strong>${stats.avgMPG}</strong> mpg avg` : 'No MPG yet';
-    const lastFill = v.fillups.length > 0 ? v.fillups[v.fillups.length - 1] : null;
-    const odoLabel = lastFill ? lastFill.odo.toLocaleString() + ' mi' : 'No entries yet';
+    const last = lastEntry(v);
+    const odoLabel = last ? last.odo.toLocaleString() + ' <span>mi</span>' : '<span>No entries yet</span>';
+    const fuel = lastFuelEntry(v);
+    const daysHTML = fuel
+      ? '<div class="card-days"><i class="ti ti-clock" style="font-size:11px"></i>' + daysLabel(fuel.ts) + '</div>'
+      : '';
     const card = document.createElement('div');
     card.className = 'vehicle-card';
-    card.innerHTML = `
-      <div class="card-left">
-        <div class="card-year">${v.year}</div>
-        <div class="card-name">${vehicleDisplayName(v)}</div>
-        <div class="card-mpg">${mpgLabel}</div>
-        <div class="card-mpg" style="margin-top:2px;font-size:12px">${odoLabel}</div>
-      </div>
-      <div class="card-right">
-        <button class="btn-icon" onclick="openEditVehicle(event,'${v.id}')">✏️</button>
-        <button class="btn-icon" onclick="openHistory(event,'${v.id}')">📋</button>
-      </div>
-    `;
+    card.innerHTML =
+      '<div class="gauge">' + gaugeSVG(stats.avgMPG, 84) + '</div>' +
+      '<div class="card-mid">' +
+        '<div class="card-year">' + v.year + '</div>' +
+        '<div class="card-name">' + vehicleDisplayName(v) + '</div>' +
+        '<div class="card-odo">' + odoLabel + '</div>' +
+        daysHTML +
+      '</div>' +
+      '<div class="card-actions">' +
+        '<button class="btn-icon" onclick="openEditVehicle(event,\'' + v.id + '\')"><i class="ti ti-edit"></i></button>' +
+        '<button class="btn-icon" onclick="openHistory(event,\'' + v.id + '\')"><i class="ti ti-list-details"></i></button>' +
+      '</div>';
     card.addEventListener('click', () => openLog(v.id));
     list.appendChild(card);
   });
 }
 
-// ════ SCREENS ════
+// ═══ SCREENS ═══
 function openScreen(id) { document.getElementById(id).classList.add('open'); }
 function closeScreen(id) { document.getElementById(id).classList.remove('open'); }
 
-// ════ ADD / EDIT VEHICLE ════
+// ═══ AUTO-CALC ═══
+const acState = {};
+function setupAutoCalc(prefix) {
+  acState[prefix] = ['total', 'gallons', 'ppg']; // least-recent first; output = index 0
+  ['gallons', 'ppg', 'total'].forEach(id => {
+    document.getElementById(prefix + '-' + id).addEventListener('input', () => {
+      const rec = acState[prefix];
+      rec.splice(rec.indexOf(id), 1);
+      rec.push(id);
+      recompute(prefix);
+    });
+  });
+}
+function resetAutoCalc(prefix) {
+  acState[prefix] = ['total', 'gallons', 'ppg'];
+  updateAcHighlight(prefix);
+}
+function recompute(prefix) {
+  const output = acState[prefix][0];
+  const g = parseFloat(document.getElementById(prefix + '-gallons').value);
+  const p = parseFloat(document.getElementById(prefix + '-ppg').value);
+  const t = parseFloat(document.getElementById(prefix + '-total').value);
+  const outEl = document.getElementById(prefix + '-' + output);
+  if (output === 'total' && !isNaN(g) && !isNaN(p)) outEl.value = (g * p).toFixed(2);
+  else if (output === 'ppg' && !isNaN(t) && !isNaN(g) && g > 0) outEl.value = (t / g).toFixed(3);
+  else if (output === 'gallons' && !isNaN(t) && !isNaN(p) && p > 0) outEl.value = (t / p).toFixed(3);
+  updateAcHighlight(prefix);
+}
+function updateAcHighlight(prefix) {
+  const output = acState[prefix][0];
+  ['gallons', 'ppg', 'total'].forEach(id => {
+    document.getElementById(prefix + '-' + id + '-field').classList.toggle('computed', id === output);
+  });
+}
+
+// ═══ ADD / EDIT VEHICLE ═══
 function openAddVehicle() {
   editingVehicleId = null;
-  document.getElementById('vehicle-screen-title').textContent = 'Add Vehicle';
-  document.getElementById('v-year').value = '';
-  document.getElementById('v-make').value = '';
-  document.getElementById('v-model').value = '';
-  document.getElementById('v-tank').value = '';
-  document.getElementById('v-odo').value = '';
+  document.getElementById('vehicle-screen-title').textContent = 'ADD VEHICLE';
+  ['v-year','v-make','v-model','v-tank','v-odo'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('v-tank-full').checked = true;
   document.getElementById('v-odo-field').style.display = 'block';
   document.getElementById('v-full-row').style.display = 'flex';
   document.getElementById('delete-vehicle-zone').style.display = 'none';
   openScreen('screen-vehicle');
 }
-
 function openEditVehicle(e, id) {
   e.stopPropagation();
   editingVehicleId = id;
   const v = getVehicle(id);
-  document.getElementById('vehicle-screen-title').textContent = 'Edit Vehicle';
+  document.getElementById('vehicle-screen-title').textContent = 'EDIT VEHICLE';
   document.getElementById('v-year').value = v.year;
   document.getElementById('v-make').value = v.make;
   document.getElementById('v-model').value = v.model;
   document.getElementById('v-tank').value = v.tank;
-  // Hide odometer/full-tank fields when editing — those only matter at creation
   document.getElementById('v-odo-field').style.display = 'none';
   document.getElementById('v-full-row').style.display = 'none';
   document.getElementById('delete-vehicle-zone').style.display = 'block';
   openScreen('screen-vehicle');
 }
-
 function saveVehicle() {
   const year = document.getElementById('v-year').value.trim();
   const make = document.getElementById('v-make').value.trim();
   const model = document.getElementById('v-model').value.trim();
   const tank = document.getElementById('v-tank').value.trim();
   if (!year || !make || !model) { alert('Year, make, and model are required.'); return; }
-
   if (editingVehicleId) {
     const v = getVehicle(editingVehicleId);
     v.year = year; v.make = make; v.model = model; v.tank = tank;
@@ -650,7 +718,6 @@ function saveVehicle() {
     const isFull = document.getElementById('v-tank-full').checked;
     const fillups = [];
     if (!isNaN(odoVal) && odoVal > 0 && isFull) {
-      // Anchor entry: no gallons, no cost, just an odometer stake in the ground
       fillups.push({ ts: Date.now(), odo: odoVal, gallons: 0, ppg: 0, complete: true, anchor: true });
     }
     state.vehicles.push({ id: Date.now().toString(), year, make, model, tank, fillups });
@@ -659,7 +726,6 @@ function saveVehicle() {
   render();
   closeScreen('screen-vehicle');
 }
-
 function deleteVehicle() {
   if (!confirm('Delete this vehicle and all its fill-up history?')) return;
   state.vehicles = state.vehicles.filter(v => v.id !== editingVehicleId);
@@ -668,118 +734,117 @@ function deleteVehicle() {
   closeScreen('screen-vehicle');
 }
 
-// ════ LOG FILL-UP ════
+// ═══ LOG FILL-UP ═══
 function openLog(id) {
   activeVehicleId = id;
   const v = getVehicle(id);
   const stats = calcStats(v);
+  document.getElementById('recap-gauge').innerHTML = gaugeSVG(stats.avgMPG, 72);
   document.getElementById('recap-year').textContent = v.year;
   document.getElementById('recap-name').textContent = vehicleDisplayName(v);
   document.getElementById('recap-mpg').innerHTML = stats.avgMPG
-    ? `Avg <strong>${stats.avgMPG}</strong> mpg`
+    ? 'Lifetime avg <strong>' + stats.avgMPG + '</strong> mpg'
     : 'No MPG yet';
-  document.getElementById('f-odo').value = '';
-  document.getElementById('f-gallons').value = '';
-  document.getElementById('f-ppg').value = '';
+  ['f-odo','f-gallons','f-ppg','f-total'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('f-complete').checked = true;
+  resetAutoCalc('f');
   openScreen('screen-log');
 }
-
 function saveLog() {
   const odo = parseFloat(document.getElementById('f-odo').value);
   const gallons = parseFloat(document.getElementById('f-gallons').value);
   const ppg = parseFloat(document.getElementById('f-ppg').value);
   const complete = document.getElementById('f-complete').checked;
-  if (isNaN(odo) || isNaN(gallons) || isNaN(ppg)) { alert('All fields are required.'); return; }
+  if (isNaN(odo)) { alert('Odometer is required.'); return; }
+  if (isNaN(gallons) || isNaN(ppg)) { alert('Enter any two of gallons, price, or total.'); return; }
   if (gallons <= 0) { alert('Gallons must be greater than 0.'); return; }
-
   const v = getVehicle(activeVehicleId);
-  const lastFill = v.fillups[v.fillups.length - 1];
-  if (lastFill && odo <= lastFill.odo) { alert('Odometer must be greater than your last entry.'); return; }
-
+  const last = lastEntry(v);
+  if (last && odo <= last.odo) { alert('Odometer must be greater than your last entry (' + last.odo.toLocaleString() + ' mi).'); return; }
   v.fillups.push({ ts: Date.now(), odo, gallons, ppg, complete });
   saveState();
   render();
   closeScreen('screen-log');
 }
 
-// ════ HISTORY ════
+// ═══ HISTORY ═══
 function openHistory(e, id) {
   e.stopPropagation();
   activeVehicleId = id;
   const v = getVehicle(id);
-  document.getElementById('history-title').textContent = vehicleDisplayName(v);
+  document.getElementById('history-title').textContent = vehicleDisplayName(v).toUpperCase();
   renderHistory(v);
   openScreen('screen-history');
 }
-
+function renderStatsBar(v) {
+  const s = calcStats(v);
+  const cells = [
+    { val: '$' + Math.round(s.totalCost).toLocaleString(), label: 'SPENT', accent: false },
+    { val: s.totalMiles.toLocaleString(), label: 'MILES', accent: false },
+    { val: s.avgMPG ? s.avgMPG : '—', label: 'AVG MPG', accent: true },
+    { val: s.costPerMile ? '$' + s.costPerMile : '—', label: '$ / MILE', accent: false }
+  ];
+  document.getElementById('stats-bar').innerHTML = cells.map(c =>
+    '<div class="stat-cell"><div class="stat-val' + (c.accent ? ' accent' : '') + '">' + c.val + '</div><div class="stat-label">' + c.label + '</div></div>'
+  ).join('');
+}
 function renderHistory(v) {
+  renderStatsBar(v);
   const list = document.getElementById('history-list');
-
-  // Filter out silent anchor entries from the visible list
-  const visible = v.fillups
-    .map((f, i) => ({ ...f, origIdx: i }))
-    .filter(f => !f.anchor)
-    .reverse();
-
+  const visible = v.fillups.map((f, i) => ({ ...f, origIdx: i })).filter(f => !f.anchor).reverse();
   if (visible.length === 0) {
     list.innerHTML = '<div class="no-fillups">No fill-ups logged yet.</div>';
     return;
   }
   list.innerHTML = '';
-
   visible.forEach(f => {
     const mpg = f.complete ? fillupMPG(v, f.origIdx) : null;
     const miles = milesDriven(v, f.origIdx);
     const date = new Date(f.ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const time = new Date(f.ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
     const cost = (f.gallons * f.ppg).toFixed(2);
-    const partialTag = !f.complete ? '<span class="tag-partial">Partial</span>' : '';
-    const milesLabel = miles !== null ? `${miles.toLocaleString()} mi traveled` : '— mi traveled';
-
+    const partialTag = !f.complete ? '<span class="tag-partial">PARTIAL</span>' : '';
+    const milesLead = miles !== null ? miles.toLocaleString() + ' <span>mi traveled</span>' : '— <span>mi traveled</span>';
     const row = document.createElement('div');
     row.className = 'fillup-row';
-    row.innerHTML = `
-      <div class="fillup-info">
-        <div class="fillup-date">${date} · ${time}${partialTag}</div>
-        <div class="fillup-stats">${milesLabel} · ${f.odo.toLocaleString()} mi total · ${f.gallons} gal · $${f.ppg.toFixed(3)}/gal</div>
-        <div class="fillup-sub">Total: $${cost}</div>
-      </div>
-      <div class="fillup-mpg">
-        ${mpg ? mpg : '—'}
-        <small>${mpg ? 'mpg' : (f.complete ? 'no anchor' : 'partial')}</small>
-      </div>
-      <button class="btn-icon" onclick="openEditModal('${v.id}', ${f.origIdx})">✏️</button>
-    `;
+    row.innerHTML =
+      '<div class="fillup-info">' +
+        '<div class="fillup-date">' + date + partialTag + '</div>' +
+        '<div class="fillup-lead">' + milesLead + '</div>' +
+        '<div class="fillup-sub">' + f.odo.toLocaleString() + ' mi total · ' + f.gallons + ' gal · $' + cost + '</div>' +
+      '</div>' +
+      '<div class="fillup-mpg">' + (mpg ? mpg : '—') +
+        '<small>' + (mpg ? 'MPG' : (f.complete ? 'NO ANCHOR' : 'PARTIAL')) + '</small>' +
+      '</div>' +
+      '<button class="btn-icon" onclick="openEditModal(\'' + v.id + '\', ' + f.origIdx + ')"><i class="ti ti-edit"></i></button>';
     list.appendChild(row);
   });
 }
 
-// ════ EDIT FILL-UP MODAL ════
+// ═══ EDIT FILL-UP ═══
 function openEditModal(vid, idx) {
   activeVehicleId = vid;
   editingFillupIdx = idx;
-  const v = getVehicle(vid);
-  const f = v.fillups[idx];
+  const f = getVehicle(vid).fillups[idx];
   document.getElementById('e-odo').value = f.odo;
   document.getElementById('e-gallons').value = f.gallons;
   document.getElementById('e-ppg').value = f.ppg;
+  document.getElementById('e-total').value = (f.gallons * f.ppg).toFixed(2);
   document.getElementById('e-complete').checked = f.complete !== false;
+  resetAutoCalc('e');
   document.getElementById('modal-edit').classList.add('open');
 }
-
 function closeEditModal(e) {
   if (e && e.target !== document.getElementById('modal-edit')) return;
   document.getElementById('modal-edit').classList.remove('open');
 }
-
 function saveEditLog() {
   const odo = parseFloat(document.getElementById('e-odo').value);
   const gallons = parseFloat(document.getElementById('e-gallons').value);
   const ppg = parseFloat(document.getElementById('e-ppg').value);
   const complete = document.getElementById('e-complete').checked;
-  if (isNaN(odo) || isNaN(gallons) || isNaN(ppg)) { alert('All fields are required.'); return; }
-
+  if (isNaN(odo)) { alert('Odometer is required.'); return; }
+  if (isNaN(gallons) || isNaN(ppg)) { alert('Enter any two of gallons, price, or total.'); return; }
+  if (gallons <= 0) { alert('Gallons must be greater than 0.'); return; }
   const v = getVehicle(activeVehicleId);
   Object.assign(v.fillups[editingFillupIdx], { odo, gallons, ppg, complete });
   saveState();
@@ -787,7 +852,6 @@ function saveEditLog() {
   renderHistory(v);
   document.getElementById('modal-edit').classList.remove('open');
 }
-
 function deleteFillup() {
   if (!confirm('Delete this fill-up?')) return;
   const v = getVehicle(activeVehicleId);
@@ -798,15 +862,15 @@ function deleteFillup() {
   document.getElementById('modal-edit').classList.remove('open');
 }
 
-// ════ CSV EXPORT ════
+// ═══ CSV EXPORT ═══
 function exportCSV() {
   const v = getVehicle(activeVehicleId);
   const rows = [['Date', 'Time', 'Miles Traveled', 'Odometer', 'Gallons', 'Price Per Gallon', 'Total Cost', 'MPG', 'Type']];
-  v.fillups.filter(f => !f.anchor).forEach((f, _, arr) => {
-    const origIdx = v.fillups.indexOf(f);
+  v.fillups.forEach((f, i) => {
+    if (f.anchor) return;
     const d = new Date(f.ts);
-    const mpg = f.complete ? fillupMPG(v, origIdx) : null;
-    const miles = milesDriven(v, origIdx);
+    const mpg = f.complete ? fillupMPG(v, i) : null;
+    const miles = milesDriven(v, i);
     rows.push([
       d.toLocaleDateString('en-US'),
       d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
@@ -824,14 +888,16 @@ function exportCSV() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${v.year}-${v.make}-${v.model}-fillups.csv`.replace(/\s+/g, '-');
+  a.download = (v.year + '-' + v.make + '-' + v.model + '-fillups.csv').replace(/\s+/g, '-');
   a.click();
   URL.revokeObjectURL(url);
 }
 
-// ════ INIT ════
+// ═══ INIT ═══
 loadState();
 render();
+setupAutoCalc('f');
+setupAutoCalc('e');
 </script>
 </body>
 </html>
