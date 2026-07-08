@@ -83,17 +83,23 @@
   .btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
   .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
   .btn-icon {
-    background: none;
-    border: none;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
     cursor: pointer;
-    color: var(--muted-2);
-    padding: 6px;
-    border-radius: 8px;
+    color: var(--text);
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
     font-size: 19px;
     line-height: 1;
-    transition: color .15s;
+    flex-shrink: 0;
+    transition: border-color .15s, color .15s;
   }
-  .btn-icon:active { color: var(--accent); }
+  .btn-icon:active { color: var(--accent); border-color: var(--accent); }
+  .btn-icon svg { display: block; }
 
   /* ── VEHICLE CARDS ── */
   #vehicle-list {
@@ -517,6 +523,11 @@ let editingFillupIdx = null;
 let editingVehicleId = null;
 const GAUGE_MAX = 50;
 
+// Inline SVG icons — no external font dependency, so they can never fail to load.
+const IC_EDIT = '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L18.5 9.5a2.83 2.83 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>';
+const IC_HISTORY = '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="6" height="6" rx="1"/><rect x="3" y="14" width="6" height="6" rx="1"/><path d="M13 6h8M13 9h5M13 16h8M13 19h5"/></svg>';
+const IC_CLOCK = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:1px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+
 function loadState() {
   try { state = JSON.parse(localStorage.getItem('fuellog') || '{"vehicles":[]}'); }
   catch { state = { vehicles: [] }; }
@@ -619,7 +630,7 @@ function render() {
     const odoLabel = last ? last.odo.toLocaleString() + ' <span>mi</span>' : '<span>No entries yet</span>';
     const fuel = lastFuelEntry(v);
     const daysHTML = fuel
-      ? '<div class="card-days"><i class="ti ti-clock" style="font-size:11px"></i>' + daysLabel(fuel.ts) + '</div>'
+      ? '<div class="card-days">' + IC_CLOCK + daysLabel(fuel.ts) + '</div>'
       : '';
     const card = document.createElement('div');
     card.className = 'vehicle-card';
@@ -632,8 +643,8 @@ function render() {
         daysHTML +
       '</div>' +
       '<div class="card-actions">' +
-        '<button class="btn-icon" onclick="openEditVehicle(event,\'' + v.id + '\')"><i class="ti ti-edit"></i></button>' +
-        '<button class="btn-icon" onclick="openHistory(event,\'' + v.id + '\')"><i class="ti ti-list-details"></i></button>' +
+        '<button class="btn-icon" aria-label="Edit vehicle" onclick="openEditVehicle(event,\'' + v.id + '\')">' + IC_EDIT + '</button>' +
+        '<button class="btn-icon" aria-label="History" onclick="openHistory(event,\'' + v.id + '\')">' + IC_HISTORY + '</button>' +
       '</div>';
     card.addEventListener('click', () => openLog(v.id));
     list.appendChild(card);
@@ -815,7 +826,7 @@ function renderHistory(v) {
       '<div class="fillup-mpg">' + (mpg ? mpg : '—') +
         '<small>' + (mpg ? 'MPG' : (f.complete ? 'NO ANCHOR' : 'PARTIAL')) + '</small>' +
       '</div>' +
-      '<button class="btn-icon" onclick="openEditModal(\'' + v.id + '\', ' + f.origIdx + ')"><i class="ti ti-edit"></i></button>';
+      '<button class="btn-icon" aria-label="Edit fill-up" onclick="openEditModal(\'' + v.id + '\', ' + f.origIdx + ')">' + IC_EDIT + '</button>';
     list.appendChild(row);
   });
 }
